@@ -162,10 +162,35 @@ sub raw_query {
 
     }
 
+    $Data::Dumper::Sortkeys = 1;
+    $Data::Dumper::Terse    = 1;
     given ($self->verbosity) {
 
-        when (1) { print $response->as_string; }
-        when (2) { print Dumper($response); }
+        when (1) {
+            print "-------------------------------------------\n".
+                  "ZabbixAPI Request for method $args{method} \n".
+                  "-------------------------------------------\n".
+                  Data::Dumper::Dumper( JSON::decode_json($response->request->decoded_content) )."\n";
+
+            print "-------------------------------------------\n".
+                  "ZabbixAPI Response for method $args{method}\n".
+                  "-------------------------------------------\n".
+                  Data::Dumper::Dumper( JSON::decode_json($response->decoded_content) )."\n";
+        }
+        when (2) {
+            print "-------------------------------------------\n".
+                  "ZabbixAPI Request for method $args{method} \n".
+                  "-------------------------------------------\n".
+                  $response->request->as_string."\n";
+
+            print "-------------------------------------------\n".
+                  "ZabbixAPI Response for method $args{method}\n".
+                  "-------------------------------------------\n".
+                  $response->as_string."\n";
+        }
+        when (3) {
+            print Dumper($response);
+        }
         default { }
 
     }
@@ -401,8 +426,9 @@ JSON-RPC version, and HTTP request headers) are set by the method itself.
 
 Return a C<HTTP::Response> object.
 
-If the verbosity is set to 1, will print the C<HTTP::Response> to STDOUT.  If
-set to 2, will print the Data::Dumper output of same (it also contains the
+If the verbosity is set to 0, will print the JSON-messages to STDOUT.
+If 1, will print the C<HTTP::Response> to STDOUT.
+If set to 2, will print the Data::Dumper output of same (it also contains the
 C<HTTP::Request> being replied to).
 
 If the verbosity is strictly greater than 0, the internal LWP::UserAgent
@@ -459,7 +485,7 @@ etc.
 
 Mutator for the verbosity level.
 
-Implemented verbosities so far are 0, 1 and 2, where:
+Implemented verbosities so far are 0, 1 2, and 3, where:
 
 =over 4
 
@@ -469,10 +495,14 @@ does not emit any messages,
 
 =item 1
 
-prints out the C<LWP::UserAgent> progress messages and the responses sent by the
-Zabbix server,
+prints out the C<LWP::UserAgent> progress messages and the JSON requests to the
+Zabbix server and responses sent by the Zabbix server,
 
 =item 2
+
+Same as verbosity 1, but with complete HTTP::Message dumps, including headers.
+
+=item 3
 
 prints out the C<LWP::UserAgent> progress messages and dumps to stdout (via
 C<Data::Dumper>) the queries sent to the server and the responses received.
@@ -494,7 +524,7 @@ A string containing the URL to which JSON-RPC queries should be POSTed.
 
 =item verbosity
 
-Verbosity level.  So far levels 0 to 2 are supported (i.e. do something
+Verbosity level.  So far levels 0 to 3 are supported (i.e. do something
 different).
 
 =item cookie
