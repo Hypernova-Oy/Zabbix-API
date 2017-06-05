@@ -102,7 +102,7 @@ $host1->push();
 
 
 ##Close session
-$zabbix->logout();
+$zabbix->raw_query(method => 'user.logout', params => []);
 
 
 
