@@ -148,7 +148,7 @@ sub raw_query {
 
     # common parameters
     $args{'jsonrpc'} = '2.0';
-    $args{'auth'} = $self->cookie || '';
+    $args{'auth'} = $self->cookie || undef;
     $args{'id'} = $global_id++;
 
     my $response = eval { $self->{ua}->post($self->{server},
