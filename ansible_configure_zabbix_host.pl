@@ -95,6 +95,7 @@ my $host1 = Zabbix::API::Host->new(root => $zabbix, data => {
         port =>   $agent_port,
     }],
     tls_connect =>      2,
+    tls_accept  =>      2,
     tls_psk_identity => $tls_psk_identity,
     tls_psk =>          $tls_psk,
 });
